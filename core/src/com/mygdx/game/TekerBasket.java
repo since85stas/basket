@@ -16,7 +16,7 @@ public class TekerBasket extends ApplicationAdapter {
 //	Texture img;
 //	Texture ballTexture;
 //	Texture
-	Ball ball;
+
 	Player player;
 	Basket basket;
 	int width;
@@ -24,25 +24,26 @@ public class TekerBasket extends ApplicationAdapter {
 	
 	@Override
 	public void create () {
-
-//		Gdx.graphics.setContinuousRendering(true);
-
 		width = Gdx.graphics.getWidth();
 		height = Gdx.graphics.getHeight();
 
 		AssetManager am = new AssetManager();
 		Assets.instance.init(am);
 		batch = new SpriteBatch();
-		player = new Player(batch,((BASKET_LENGHT - FREE_THROW_DISTANCE)*DIM),(0*DIM));
-
+		player = new Player(batch,((BASKET_LENGHT - FREE_THROW_DISTANCE)*DIM),(0*DIM), this);
 		basket = new Basket(batch, (BASKET_LENGHT*DIM), (BASKET_HEIGHT*DIM));
 
-		TrajectoryCalc trajectory = new TrajectoryCalc(player,basket,60);
+		int numBalls = 1;
+		float alfa = 59;
+		float dAlfa = 10;
+		for (int i = 0; i < numBalls; i++) {
+			TrajectoryCalc trajectory = new TrajectoryCalc(player,basket,alfa);
+			float err = 1f;
+			Vector2 vel = new Vector2(trajectory.getVelocity().x*err,trajectory.getVelocity().y*err);
+			player.throwBall(vel,alfa);
+			alfa += dAlfa/numBalls;
+		}
 
-		float err = 0.989f;
-		Vector2 vel = new Vector2(trajectory.getVelocity().x*err,trajectory.getVelocity().y*err);
-
-		ball = new Ball(batch,player.getBallCenter().x,player.getBallCenter().y,vel ,basket);
 	}
 
 	@Override
@@ -52,7 +53,7 @@ public class TekerBasket extends ApplicationAdapter {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		batch.begin();
 //		batch.draw(img, 0, 0);
-		ball.render(dt);
+		player.render(dt);
 		basket.render(dt);
 		batch.end();
 	}

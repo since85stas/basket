@@ -19,12 +19,14 @@ public class Ball {
     float yCenter;
     public Circle hitBox;
     Vector2 velocity;
+    float initAlfa;
     float timeSum;
     float xDistance;
     Basket basket;
+    public boolean ballIsScore;
 
 
-    public Ball (SpriteBatch batch, float x, float y, Vector2 velocity, Basket basket) {
+    public Ball (SpriteBatch batch, float x, float y, Vector2 velocity,float alfa, Basket basket) {
         this.batch = batch;
         this.x = x;
         this.y = y;
@@ -34,6 +36,7 @@ public class Ball {
         height = Gdx.graphics.getHeight();
 
         this.velocity = velocity;
+        initAlfa = alfa;
         this.basket = basket;
         float xB = basket.getBasketCenter().x - x;
     }
@@ -55,21 +58,23 @@ public class Ball {
         xDistance += dx;
         xCenter   += dx;
         yCenter   += dy;
-        Gdx.app.log("baall","dt=" + dt + " dx= " + dx + " time=" + timeSum + " dist=" + xDistance  );
-        Gdx.app.log("baall","fps=" + 1/dt);
+//        Gdx.app.log("baall","dt=" + dt + " dx= " + dx + " time=" + timeSum + " dist=" + xDistance  );
+//        Gdx.app.log("baall","fps=" + 1/dt);
         double dv = 9.8*dt;
         velocity.y -= dv;
-        if (xCenter > basket.getBasketCenter().x) {
+        if (xCenter < basket.getBasketCenter().x) {
             Gdx.app.log("baall","fff");
         }
         hitBox = new Circle(xCenter,yCenter,BALL_DIAMETER/2*DIM);
         checkEdgeInters(basket.leftEdge);
         checkEdgeInters(basket.rightEdge);
+
+        checkBallIsScore();
     }
 
     private boolean checkEdgeInters(BasketEdge edge) {
         if (hitBox.overlaps(edge.hitBox)) {
-            velocity = isCollision(edge);
+            velocity = isCollisionNew(edge);
             return true;
         } else {
             return false;
@@ -87,4 +92,31 @@ public class Ball {
         return newVel;
     }
 
+    private Vector2 isCollisionNew(BasketEdge edge) {
+        Vector2 newVel;
+        float dyDx = (edge.yCenter - yCenter)/(edge.xCenter - xCenter);
+        float gamma = (float) Math.atan(dyDx);
+        float alfa  = (float) Math.atan(velocity.x/velocity.y);
+        float beta  = gamma - alfa;
+        float velMod = velAfterCollision((float) Math.sqrt(velocity.x*velocity.x + velocity.y*velocity.y));
+        float vT     = -1*(float) Math.cos(beta)*velMod;
+        float vN     = (float) Math.sin(beta)*velMod;
+        newVel = new Vector2(vT,vN);
+        Gdx.app.log("collision","end");
+        return newVel;
+    }
+
+    private float velAfterCollision(float vel) {
+
+        return vel*0.5f;
+    }
+
+
+    private void checkBallIsScore () {
+        if (yCenter < basket.y && (xCenter < basket.rightEdge.xCenter && xCenter > basket.leftEdge.xCenter)) {
+            ballIsScore = true;
+        } else {
+            ballIsScore = false;
+        }
+    }
 }

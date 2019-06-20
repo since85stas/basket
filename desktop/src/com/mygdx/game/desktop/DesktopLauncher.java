@@ -13,7 +13,7 @@ public class DesktopLauncher {
 
 		config.foregroundFPS = 100;
 		config.backgroundFPS = 100;
-		config.width = 1500;
-		config.height = 600;
+		config.width = 1000;
+		config.height = 400;
 	}
 }
