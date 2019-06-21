@@ -27,7 +27,7 @@ public class Basket {
     }
 
     public void render (float dt) {
-//        batch.draw(Assets.instance.basketAssets.ballTexture,x, height -  y,BALL_DIAMETER*DIM,BALL_DIAMETER*DIM);
+        batch.draw(Assets.instance.basketAssets.ballTexture,x, y ,BASKET_EDGE_DIAMETER*DIM,BASKET_EDGE_DIAMETER*DIM);
         leftEdge.render(dt);
         rightEdge.render(dt);
     }

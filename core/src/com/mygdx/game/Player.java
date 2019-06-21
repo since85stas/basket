@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
@@ -17,16 +18,19 @@ public class Player {
     List<Ball> pool;
 
     SpriteBatch batch;
+    ShapeRenderer shape;
     float x;
     float y;
     int width;
     int height;
 
-    public Player(SpriteBatch batch, float x, float y, TekerBasket parent) {
+
+    public Player(SpriteBatch batch, float x, float y, TekerBasket parent, ShapeRenderer shape) {
         width = Gdx.graphics.getWidth();
         height = Gdx.graphics.getHeight();
         this.batch = batch;
         this.parent = parent;
+        this.shape  = shape;
         this.x = x;
         this.y = y;
         pool = new ArrayList<Ball>();
@@ -43,7 +47,7 @@ public class Player {
     }
 
     public void throwBall(Vector2 velocity, float alfa) {
-        ball = new Ball(batch,getBallCenter().x,getBallCenter().y,velocity ,alfa, parent.basket);
+        ball = new Ball(batch,getBallCenter().x,getBallCenter().y,velocity ,alfa, parent.basket, shape);
         pool.add(ball);
     }
 
@@ -54,7 +58,17 @@ public class Player {
         }
         if(pool.get(0).yCenter < 0) {
              Gdx.app.log("ball","ball is on floor");
+             endSereie();
         }
+    }
+
+    public void endSereie() {
+        int i = 0;
+        for (int j = 0; j < pool.size(); j++) {
+            if ( pool.get(j).ballIsScore) i++;
+        }
+        float accuracy = i/pool.size();
+        pool = new ArrayList<Ball>();
     }
 
 }

@@ -12,7 +12,7 @@ public class TrajectoryCalc {
     double alfaRad;
 
     public TrajectoryCalc(Player player, Basket basket, float alfa) {
-        alfaRad = alfa * 3.14 /180;
+        alfaRad = alfa * 3.14159 /180;
         float xB = basket.getBasketCenterInM().x - player.getBallCenterInM().x;
         float yB = basket.getBasketCenterInM().y - player.getBallCenterInM().y;
         float xBinPix = xB*DIM;

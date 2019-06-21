@@ -28,13 +28,13 @@ public class BasketEdge {
         height = Gdx.graphics.getHeight();
 
 //        hitBox = new Circle(x - BASKET_EDGE_DIAMETER/2*DIM, y -  BASKET_EDGE_DIAMETER/2*DIM, BASKET_EDGE_DIAMETER/2*DIM  );
-        hitBox = new Circle(xCenter,yCenter,BASKET_EDGE_DIAMETER/2*DIM);
+        hitBox = new Circle(xCenter -BASKET_EDGE_DIAMETER*DIM/2,yCenter-BASKET_EDGE_DIAMETER*DIM/2 ,BASKET_EDGE_DIAMETER/2*DIM);
     }
 
     public void render (float dt) {
         batch.draw(Assets.instance.basketAssets.basketEdgeTexture,
-                xCenter,
-                yCenter ,
+                xCenter -BASKET_EDGE_DIAMETER*DIM/2,
+                yCenter -BASKET_EDGE_DIAMETER*DIM/2,
                 BASKET_EDGE_DIAMETER*DIM,BASKET_EDGE_DIAMETER*DIM);
     }
 

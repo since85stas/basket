@@ -3,9 +3,10 @@ package com.mygdx.game;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
 import static com.mygdx.game.Const.*;
@@ -13,6 +14,7 @@ import static com.mygdx.game.Assets.*;
 
 public class TekerBasket extends ApplicationAdapter {
 	SpriteBatch batch;
+	ShapeRenderer shape;
 //	Texture img;
 //	Texture ballTexture;
 //	Texture
@@ -21,6 +23,11 @@ public class TekerBasket extends ApplicationAdapter {
 	Basket basket;
 	int width;
 	int height;
+
+	TrajectoryCalc idealTrajectory;
+	float angle;
+	float angleChangePercent;
+	float dAngle;
 	
 	@Override
 	public void create () {
@@ -30,20 +37,45 @@ public class TekerBasket extends ApplicationAdapter {
 		AssetManager am = new AssetManager();
 		Assets.instance.init(am);
 		batch = new SpriteBatch();
-		player = new Player(batch,((BASKET_LENGHT - FREE_THROW_DISTANCE)*DIM),(0*DIM), this);
+		shape = new ShapeRenderer();
+		shape.setColor(Color.BLUE);
+		shape.setProjectionMatrix(batch.getProjectionMatrix());
+		shape.setAutoShapeType(true);
+		player = new Player(batch,((BASKET_LENGHT - FREE_THROW_DISTANCE)*DIM),(0*DIM), this, shape);
 		basket = new Basket(batch, (BASKET_LENGHT*DIM), (BASKET_HEIGHT*DIM));
 
-		int numBalls = 1;
-		float alfa = 59;
-		float dAlfa = 10;
-		for (int i = 0; i < numBalls; i++) {
-			TrajectoryCalc trajectory = new TrajectoryCalc(player,basket,alfa);
-			float err = 1f;
-			Vector2 vel = new Vector2(trajectory.getVelocity().x*err,trajectory.getVelocity().y*err);
-			player.throwBall(vel,alfa);
-			alfa += dAlfa/numBalls;
-		}
+		int numBalls = 10;
+		angle  = 45;
+		angleChangePercent = 10;
+		float dAngleDiapozone = angle* angleChangePercent / 100;
+		dAngle      = dAngleDiapozone /numBalls;
+		angle       = angle - dAngleDiapozone/2;
+		initAngleStep();
 
+	}
+
+	public void initAngleStep() {
+		if (angle < angle + angle*angleChangePercent/2) {
+			idealTrajectory = new  TrajectoryCalc(player,basket,angle);
+			initVelErrorSerie(angle);
+			angle += dAngle;
+		}
+	}
+
+
+
+	public void initVelErrorSerie(float alfa) {
+//		TrajectoryCalc trajectory =
+		int numVelocPoints = 10;
+		float errPercentage = 3;
+		float err = 1-errPercentage/2/100;
+		float dErr = errPercentage/numVelocPoints/100;
+		for (int j = 0; j < numVelocPoints; j++) {
+			err += dErr;
+			Vector2 vel = new Vector2(idealTrajectory.getVelocity().x*err,idealTrajectory.getVelocity().y*err);
+			player.throwBall(vel,alfa);
+
+		}
 	}
 
 	@Override
@@ -56,6 +88,10 @@ public class TekerBasket extends ApplicationAdapter {
 		player.render(dt);
 		basket.render(dt);
 		batch.end();
+
+//		shape.begin(ShapeRenderer.ShapeType.Line);
+//		shape.line(new Vector2(0,0),new Vector2(100,100));
+//		shape.end();
 	}
 
 	@Override

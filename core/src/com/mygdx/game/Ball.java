@@ -1,7 +1,9 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -11,6 +13,7 @@ import static com.mygdx.game.Assets.*;
 public class Ball {
 
     SpriteBatch batch;
+    ShapeRenderer shape;
     float x;
     float y;
     int width;
@@ -26,8 +29,9 @@ public class Ball {
     public boolean ballIsScore;
 
 
-    public Ball (SpriteBatch batch, float x, float y, Vector2 velocity,float alfa, Basket basket) {
+    public Ball (SpriteBatch batch, float x, float y, Vector2 velocity, float alfa, Basket basket, ShapeRenderer shape) {
         this.batch = batch;
+        this.shape = shape;
         this.x = x;
         this.y = y;
         xCenter = x;
@@ -39,14 +43,24 @@ public class Ball {
         initAlfa = alfa;
         this.basket = basket;
         float xB = basket.getBasketCenter().x - x;
+
+//        shape.begin(ShapeRenderer.ShapeType.Line);
     }
 
     public void render (float dt) {
-        update(dt);
+        for (int i = 0; i < 20; i++) {
+            update(dt/20);
+        }
+//        update(dt);
         batch.draw(Assets.instance.basketAssets.ballTexture,
-                xCenter - BALL_DIAMETER*DIM/2,
-                yCenter - BALL_DIAMETER*DIM/2,
+                xCenter -BALL_DIAMETER*DIM/2,
+                yCenter -BALL_DIAMETER*DIM/2,
                 BALL_DIAMETER*DIM,BALL_DIAMETER*DIM);
+
+//        batch.draw(Assets.instance.basketAssets.ballTexture,
+//                xCenter - BALL_DIAMETER*DIM/2,
+//                yCenter - BALL_DIAMETER*DIM/2,
+//                BALL_DIAMETER*DIM/10,BALL_DIAMETER*DIM/10);
 
     }
 
@@ -56,14 +70,16 @@ public class Ball {
         float dy = velocity.y*DIM*dt;
 //        float dy = 0;
         xDistance += dx;
+//        shape.line(new Vector2(xCenter,yCenter),new Vector2(xCenter+dx,yCenter+dy));
         xCenter   += dx;
         yCenter   += dy;
 //        Gdx.app.log("baall","dt=" + dt + " dx= " + dx + " time=" + timeSum + " dist=" + xDistance  );
 //        Gdx.app.log("baall","fps=" + 1/dt);
         double dv = 9.8*dt;
         velocity.y -= dv;
-        if (xCenter < basket.getBasketCenter().x) {
-            Gdx.app.log("baall","fff");
+
+        if (xCenter > basket.getBasketCenter().x) {
+//            Gdx.app.log("baall","fff");
         }
         hitBox = new Circle(xCenter,yCenter,BALL_DIAMETER/2*DIM);
         checkEdgeInters(basket.leftEdge);
@@ -108,7 +124,7 @@ public class Ball {
 
     private float velAfterCollision(float vel) {
 
-        return vel*0.5f;
+        return vel*0.7f;
     }
 
 
