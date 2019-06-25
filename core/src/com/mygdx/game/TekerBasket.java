@@ -45,38 +45,50 @@ public class TekerBasket extends ApplicationAdapter {
 		basket = new Basket(batch, (BASKET_LENGHT*DIM), (BASKET_HEIGHT*DIM));
 
 		int numBalls = 10;
-		angle  = 45;
-		angleChangePercent = 10;
+		angle  = 55;
+		angleChangePercent = 4;
 		float dAngleDiapozone = angle* angleChangePercent / 100;
 		dAngle      = dAngleDiapozone /numBalls;
 		angle       = angle - dAngleDiapozone/2;
 		initAngleStep();
-
+//		singleThrow();
 	}
 
 	public void initAngleStep() {
-		if (angle < angle + angle*angleChangePercent/2) {
+		if (angle <= angle + angle*angleChangePercent/2) {
 			idealTrajectory = new  TrajectoryCalc(player,basket,angle);
 			initVelErrorSerie(angle);
+//			initSingleThrow( angle);
 			angle += dAngle;
 		}
 	}
 
+	public void singleThrow() {
+		idealTrajectory = new  TrajectoryCalc(player,basket,angle);
+//			initVelErrorSerie(angle);
+		initSingleThrow( angle);
+	}
 
 
 	public void initVelErrorSerie(float alfa) {
 //		TrajectoryCalc trajectory =
-		int numVelocPoints = 10;
-		float errPercentage = 3;
+		int numVelocPoints = 20;
+		float errPercentage = 4;
 		float err = 1-errPercentage/2/100;
 		float dErr = errPercentage/numVelocPoints/100;
 		for (int j = 0; j < numVelocPoints; j++) {
-			err += dErr;
+
 			Vector2 vel = new Vector2(idealTrajectory.getVelocity().x*err,idealTrajectory.getVelocity().y*err);
 			player.throwBall(vel,alfa);
-
+			err += dErr;
 		}
 	}
+
+	public void initSingleThrow(float alfa) {
+	    float err = 1f;
+        Vector2 vel = new Vector2(idealTrajectory.getVelocity().x*err,idealTrajectory.getVelocity().y*err);
+        player.throwBall(vel,alfa);
+    }
 
 	@Override
 	public void render () {

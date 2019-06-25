@@ -23,6 +23,7 @@ public class Player {
     float y;
     int width;
     int height;
+    boolean seriaIsStart;
 
 
     public Player(SpriteBatch batch, float x, float y, TekerBasket parent, ShapeRenderer shape) {
@@ -49,6 +50,7 @@ public class Player {
     public void throwBall(Vector2 velocity, float alfa) {
         ball = new Ball(batch,getBallCenter().x,getBallCenter().y,velocity ,alfa, parent.basket, shape);
         pool.add(ball);
+        seriaIsStart = true;
     }
 
     public void render (float dt) {
@@ -56,7 +58,7 @@ public class Player {
         for (int i = 0; i < pool.size(); i++) {
             pool.get(i).render(dt);
         }
-        if(pool.get(0).yCenter < 0) {
+        if(checkEndSerie() && seriaIsStart) {
              Gdx.app.log("ball","ball is on floor");
              endSereie();
         }
@@ -67,8 +69,18 @@ public class Player {
         for (int j = 0; j < pool.size(); j++) {
             if ( pool.get(j).ballIsScore) i++;
         }
+
         float accuracy = i/pool.size();
         pool = new ArrayList<Ball>();
+        seriaIsStart = false;
+    }
+
+    public boolean checkEndSerie() {
+        boolean end= true;
+        for (int i = 0; i < pool.size(); i++) {
+            end &= pool.get(i).ballIsOut;
+        }
+        return end;
     }
 
 }
