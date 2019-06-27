@@ -35,11 +35,11 @@ public class Assets implements Disposable, AssetErrorListener {
         this.assetManager = assetManager;
         assetManager.setErrorListener(this);
         assetManager.load("sphere_blue.png", Texture.class);
-        assetManager.load("sphere_yellow.png",Texture.class);
+        assetManager.load("mini_sphere_yellow.png",Texture.class);
 //        assetManager.load("explosion-large.png",Texture.class);
 //        assetManager.load("crosshairs_strip6.png",Texture.class);
         assetManager.finishLoading();
-        Texture ballTexture = assetManager.get("sphere_yellow.png");
+        Texture ballTexture = assetManager.get("mini_sphere_yellow.png");
         Texture basketEdgeTexture = assetManager.get("sphere_blue.png");
 //        Texture brokenTexture = assetManager.get("explosion-large.png");
 //        Texture crossTexture = assetManager.get("crosshairs_strip6.png");

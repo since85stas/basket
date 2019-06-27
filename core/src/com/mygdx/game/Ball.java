@@ -23,14 +23,16 @@ public class Ball {
     public Circle hitBox;
     Vector2 velocity;
     float initAlfa;
+    float idealAlfa;
     float timeSum;
     float xDistance;
     Basket basket;
     public boolean ballIsScore = false;
     public boolean ballIsOut;
+    public boolean isAboveBasket;
 
 
-    public Ball (SpriteBatch batch, float x, float y, Vector2 velocity, float alfa, Basket basket, ShapeRenderer shape) {
+    public Ball (SpriteBatch batch, float x, float y, Vector2 velocity, float alfa, Basket basket, ShapeRenderer shape, float idealAlfa) {
         this.batch = batch;
         this.shape = shape;
         this.x = x;
@@ -42,6 +44,7 @@ public class Ball {
 
         this.velocity = velocity;
         initAlfa = alfa;
+        this.idealAlfa = idealAlfa;
         this.basket = basket;
         float xB = basket.getBasketCenter().x - x;
 
@@ -49,8 +52,12 @@ public class Ball {
     }
 
     public void render (float dt) {
-        for (int i = 0; i < 30; i++) {
-            update(dt/30);
+//                Gdx.app.log("baall","dt=" + dt +  " time=" + timeSum + " dist=" + xDistance  );
+//        Gdx.app.log("baall","fps=" + 1/dt);
+        if (dt < 1f/20f) {
+            for (int i = 0; i < 100; i++) {
+                update(dt / 100);
+            }
         }
 //        update(dt);
         batch.draw(Assets.instance.basketAssets.ballTexture,
@@ -66,6 +73,19 @@ public class Ball {
     }
 
     public void update (float dt) {
+        if (xCenter > basket.getBasketCenter().x) {
+//            Gdx.app.log("baall","fff");
+        }
+        if (yCenter > basket.getBasketCenter().y) isAboveBasket = true;
+        hitBox = new Circle(xCenter,yCenter,BALL_DIAMETER/2*DIM);
+        checkEdgeIntersSquare(basket.leftEdge);
+        checkEdgeIntersSquare(basket.rightEdge);
+
+        checkBallIsScore();
+        if (yCenter < 0) {
+            ballIsOut = true;
+        }
+
         timeSum += dt;
         float dx = velocity.x*DIM*dt;
         float dy = velocity.y*DIM*dt;
@@ -79,21 +99,22 @@ public class Ball {
         double dv = 9.8*dt;
         velocity.y -= dv;
 
-        if (xCenter > basket.getBasketCenter().x) {
-//            Gdx.app.log("baall","fff");
-        }
-        hitBox = new Circle(xCenter,yCenter,BALL_DIAMETER/2*DIM);
-        checkEdgeInters(basket.leftEdge);
-        checkEdgeInters(basket.rightEdge);
-
-        checkBallIsScore();
-        if (yCenter < 0) {
-            ballIsOut = true;
-        }
     }
 
     private boolean checkEdgeInters(BasketEdge edge) {
         if (hitBox.overlaps(edge.hitBox)) {
+            velocity = isCollisionVect(edge);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean checkEdgeIntersSquare(BasketEdge edge) {
+        float dx2 = (edge.xCenter-xCenter)*(edge.xCenter-xCenter);
+        float dy2 = (edge.yCenter-yCenter)*(edge.yCenter-yCenter);
+        float cond2 = BALL_DIAMETER/2 *DIM + BASKET_EDGE_DIAMETER/2*DIM;
+        if ( Math.sqrt(dx2 + dy2) < cond2 ) {
             velocity = isCollisionVect(edge);
             return true;
         } else {
@@ -117,13 +138,13 @@ public class Ball {
         float dyDx = (edge.yCenter - yCenter)/(edge.xCenter - xCenter);
         float gamma = (float) Math.atan(dyDx);
         if (gamma < 0) {
-            gamma = 3.14f - gamma;
+            gamma = 3.14159f - gamma;
         }
 //        float alfa  = (float) Math.atan(velocity.x/velocity.y);
         float alfa  = (float) Math.atan(velocity.x/velocity.y);
 //        float alfa  = (float) Math.atan(velocity.x/velocity.y);
 //        float beta  = gamma - alfa;
-        float beta   =  -3.14f/2 + alfa + gamma;
+        float beta   =  -3.14159f/2 + alfa + gamma;
         float velMod = velAfterCollision((float) Math.sqrt(velocity.x*velocity.x + velocity.y*velocity.y));
         float vT     = -1*(float) Math.cos(beta)*velMod;
         float vN     = (float) Math.sin(beta)*velMod;
@@ -143,6 +164,7 @@ public class Ball {
         Vector2 vN = new Vector2(velocity.x - vT.x,velocity.y - vT.y);
         Vector2 vTperp = new Vector2(vT.x*-1,vT.y*-1);
         Vector2 velocNew = new Vector2(vN.x+vTperp.x,vN.y+vTperp.y);
+        Vector2 velocNew2 = new Vector2(velocNew.x*0.7f,velocNew.y*0.7f);
         return velocNew;
     }
 
@@ -154,7 +176,7 @@ public class Ball {
 
 
     private void checkBallIsScore () {
-        if (  !ballIsScore &&(velocity.y < 0)&& (yCenter < basket.y) && (xCenter < basket.rightEdge.xCenter && xCenter > basket.leftEdge.xCenter)) {
+        if (  !ballIsScore &&(isAboveBasket)&& (yCenter < basket.y) && (xCenter < basket.rightEdge.xCenter && xCenter > basket.leftEdge.xCenter)) {
             ballIsScore = true;
         }
     }

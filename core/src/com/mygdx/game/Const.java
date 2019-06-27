@@ -7,8 +7,8 @@ public class Const {
 
     public static final float BASKET_LENGHT = 9.F;
     public static final float BASKET_HEIGHT = 3.05F;
-    public static final float BASKET_DIAMETER = 0.45F;
-    public static final float BASKET_EDGE_DIAMETER = 0.02F;
+    public static final float BASKET_DIAMETER = 0.40F;
+    public static final float BASKET_EDGE_DIAMETER = 0.01F;
 
     public static final float BALL_DIAMETER = 0.24F;
 

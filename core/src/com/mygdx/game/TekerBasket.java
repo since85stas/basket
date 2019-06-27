@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -44,50 +45,91 @@ public class TekerBasket extends ApplicationAdapter {
 		player = new Player(batch,((BASKET_LENGHT - FREE_THROW_DISTANCE)*DIM),(0*DIM), this, shape);
 		basket = new Basket(batch, (BASKET_LENGHT*DIM), (BASKET_HEIGHT*DIM));
 
-		int numBalls = 10;
-		angle  = 55;
-		angleChangePercent = 4;
-		float dAngleDiapozone = angle* angleChangePercent / 100;
-		dAngle      = dAngleDiapozone /numBalls;
-		angle       = angle - dAngleDiapozone/2;
+		int numBalls = 1;
+		angle  = 35;
+		dAngle = 1;
+		angleChangePercent = 0;
+//		float dAngleDiapozone = angle* angleChangePercent / 100;
+//		dAngle      = dAngleDiapozone /numBalls;
+//		angle       = angle - dAngleDiapozone/2;
 		initAngleStep();
 //		singleThrow();
 	}
 
 	public void initAngleStep() {
-		if (angle <= angle + angle*angleChangePercent/2) {
-			idealTrajectory = new  TrajectoryCalc(player,basket,angle);
-			initVelErrorSerie(angle);
+
+		if (angle < 70) {
+			idealTrajectory = new TrajectoryCalc(player, basket, angle);
+//			initVelErrorSerie(angle);
 //			initSingleThrow( angle);
+			initAngleErrorSerie(angle);
 			angle += dAngle;
+//			initSingleThrowAngle(44.54997f * 3.14f/180);
+//			angle += dAngle;
+		} else {
+//			player.angleResult;
+
+			FileHandle file = Gdx.files.local("results.dat");
+			file.delete();
+			for (int j = 0; j < player.angleResult.size(); j++) {
+				String fiMin = String.format("%.4f",player.angleResult.get(j).fiMin);
+				String fiMmax = String.format("%.4f",player.angleResult.get(j).fiMax);
+				String df = String.format("%.4f",player.angleResult.get(j).dFi);
+				String string = "" + player.angleResult.get(j).angle + " " + fiMin + " " +
+						fiMmax + " " + df + "\n";
+				file.writeString(string,true);
+			}
+			Gdx.app.log("end","end");
 		}
+
 	}
 
 	public void singleThrow() {
 		idealTrajectory = new  TrajectoryCalc(player,basket,angle);
 //			initVelErrorSerie(angle);
-		initSingleThrow( angle);
+//		initSingleThrow( angle);
+//		initAngleErrorSerie();
 	}
 
 
 	public void initVelErrorSerie(float alfa) {
 //		TrajectoryCalc trajectory =
-		int numVelocPoints = 20;
+		int numVelocPoints = 40;
 		float errPercentage = 4;
 		float err = 1-errPercentage/2/100;
 		float dErr = errPercentage/numVelocPoints/100;
 		for (int j = 0; j < numVelocPoints; j++) {
 
 			Vector2 vel = new Vector2(idealTrajectory.getVelocity().x*err,idealTrajectory.getVelocity().y*err);
-			player.throwBall(vel,alfa);
+			player.throwBall(vel,alfa,angle,0);
 			err += dErr;
 		}
+	}
+
+	public void initAngleErrorSerie( float alfa) {
+//		TrajectoryCalc trajectory =
+		float angleDiapozone = 5;
+		int numAnglePoints = 50 ;
+		float dAngle = angleDiapozone /numAnglePoints;
+		float angleInit = alfa - angleDiapozone/2;
+		for (int j = 0; j < numAnglePoints; j++) {
+			Vector2 vel = new Vector2( idealTrajectory.getVelocityMod()* (float) Math.cos(angleInit*3.14159/180),
+					idealTrajectory.getVelocityMod()*(float)Math.sin(angleInit*3.14159/180));
+			player.throwBall(vel,angleInit, angle, dAngle );
+			angleInit += dAngle;
+		}
+	}
+
+	public void initSingleThrowAngle(float alfa) {
+		float err = 1f;
+		Vector2 vel = new Vector2(idealTrajectory.getVelocity().x,idealTrajectory.getVelocity().y);
+		player.throwBall(vel,alfa,angle,0);
 	}
 
 	public void initSingleThrow(float alfa) {
 	    float err = 1f;
         Vector2 vel = new Vector2(idealTrajectory.getVelocity().x*err,idealTrajectory.getVelocity().y*err);
-        player.throwBall(vel,alfa);
+        player.throwBall(vel,alfa,angle,0);
     }
 
 	@Override

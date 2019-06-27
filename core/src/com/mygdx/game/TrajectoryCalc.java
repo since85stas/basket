@@ -22,6 +22,7 @@ public class TrajectoryCalc {
 
          double velNew = xB/Math.cos(alfaRad)*Math.sqrt(9.8/2/(xB*Math.tan(alfaRad) - yB));
          double timeNew = xB/velNew/Math.cos(alfaRad);
+         Vector2 vel = new Vector2((float) (velNew*Math.cos(alfaRad)),(float)( velNew*Math.sin(alfaRad)));
     }
 
 
@@ -32,5 +33,9 @@ public class TrajectoryCalc {
     public Vector2 getVelocity() {
 
         return new Vector2((float) (vel*Math.cos(alfaRad)),(float)(vel*Math.sin(alfaRad)));
+    }
+
+    public float getVelocityMod () {
+        return (float) vel;
     }
 }
