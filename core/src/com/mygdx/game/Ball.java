@@ -30,6 +30,7 @@ public class Ball {
     public boolean ballIsScore = false;
     public boolean ballIsOut;
     public boolean isAboveBasket;
+    public boolean isCollision;
 
 
     public Ball (SpriteBatch batch, float x, float y, Vector2 velocity, float alfa, Basket basket, ShapeRenderer shape, float idealAlfa) {
@@ -55,8 +56,8 @@ public class Ball {
 //                Gdx.app.log("baall","dt=" + dt +  " time=" + timeSum + " dist=" + xDistance  );
 //        Gdx.app.log("baall","fps=" + 1/dt);
         if (dt < 1f/20f) {
-            for (int i = 0; i < 100; i++) {
-                update(dt / 100);
+            for (int i = 0; i < 1000; i++) {
+                update(dt / 1000);
             }
         }
 //        update(dt);
@@ -76,11 +77,12 @@ public class Ball {
         if (xCenter > basket.getBasketCenter().x) {
 //            Gdx.app.log("baall","fff");
         }
-        if (yCenter > basket.getBasketCenter().y) isAboveBasket = true;
+        if (yCenter > basket.getBasketCenter().y + BALL_DIAMETER/2*DIM) isAboveBasket = true;
         hitBox = new Circle(xCenter,yCenter,BALL_DIAMETER/2*DIM);
-        checkEdgeIntersSquare(basket.leftEdge);
-        checkEdgeIntersSquare(basket.rightEdge);
-
+//        checkEdgeIntersSquareFalse(basket.leftEdge);
+//        checkEdgeIntersSquareFalse(basket.rightEdge);
+        checkEdgeIntersFalse(basket.leftEdge);
+        checkEdgeIntersFalse(basket.rightEdge);
         checkBallIsScore();
         if (yCenter < 0) {
             ballIsOut = true;
@@ -110,12 +112,33 @@ public class Ball {
         }
     }
 
+    private boolean checkEdgeIntersFalse(BasketEdge edge) {
+        if (hitBox.overlaps(edge.hitBox)) {
+            isCollision = true;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private boolean checkEdgeIntersSquare(BasketEdge edge) {
         float dx2 = (edge.xCenter-xCenter)*(edge.xCenter-xCenter);
         float dy2 = (edge.yCenter-yCenter)*(edge.yCenter-yCenter);
         float cond2 = BALL_DIAMETER/2 *DIM + BASKET_EDGE_DIAMETER/2*DIM;
         if ( Math.sqrt(dx2 + dy2) < cond2 ) {
             velocity = isCollisionVect(edge);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean checkEdgeIntersSquareFalse(BasketEdge edge) {
+        float dx2 = (edge.xCenter-xCenter)*(edge.xCenter-xCenter);
+        float dy2 = (edge.yCenter-yCenter)*(edge.yCenter-yCenter);
+        float cond2 = BALL_DIAMETER/2 *DIM + BASKET_EDGE_DIAMETER/2*DIM;
+        if ( Math.sqrt(dx2 + dy2) < cond2 ) {
+            isCollision = true;
             return true;
         } else {
             return false;
@@ -176,8 +199,14 @@ public class Ball {
 
 
     private void checkBallIsScore () {
-        if (  !ballIsScore &&(isAboveBasket)&& (yCenter < basket.y) && (xCenter < basket.rightEdge.xCenter && xCenter > basket.leftEdge.xCenter)) {
+        if ( !isCollision && !ballIsScore && (isAboveBasket) && (yCenter < (basket.y - BASKET_EDGE_DIAMETER*3*DIM)) && (xCenter < basket.rightEdge.xCenter) && (xCenter > basket.leftEdge.xCenter)) {
             ballIsScore = true;
+        }
+    }
+
+    private void checkBallIsScoreNew() {
+        if ( !isCollision && !ballIsScore && isAboveBasket ){
+
         }
     }
 }

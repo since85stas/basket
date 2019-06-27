@@ -46,7 +46,7 @@ public class TekerBasket extends ApplicationAdapter {
 		basket = new Basket(batch, (BASKET_LENGHT*DIM), (BASKET_HEIGHT*DIM));
 
 		int numBalls = 1;
-		angle  = 35;
+		angle  = 40;
 		dAngle = 1;
 		angleChangePercent = 0;
 //		float dAngleDiapozone = angle* angleChangePercent / 100;
@@ -58,7 +58,7 @@ public class TekerBasket extends ApplicationAdapter {
 
 	public void initAngleStep() {
 
-		if (angle < 70) {
+		if (angle < 80) {
 			idealTrajectory = new TrajectoryCalc(player, basket, angle);
 //			initVelErrorSerie(angle);
 //			initSingleThrow( angle);
