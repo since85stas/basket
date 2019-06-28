@@ -22,6 +22,7 @@ public class Ball {
     float yCenter;
     public Circle hitBox;
     Vector2 velocity;
+    float initVelocityLen;
     float initAlfa;
     float idealAlfa;
     float timeSum;
@@ -44,6 +45,7 @@ public class Ball {
         height = Gdx.graphics.getHeight();
 
         this.velocity = velocity;
+        this.initVelocityLen = velocity.len();
         initAlfa = alfa;
         this.idealAlfa = idealAlfa;
         this.basket = basket;
@@ -55,7 +57,7 @@ public class Ball {
     public void render (float dt) {
 //                Gdx.app.log("baall","dt=" + dt +  " time=" + timeSum + " dist=" + xDistance  );
 //        Gdx.app.log("baall","fps=" + 1/dt);
-        if (dt < 1f/20f) {
+        if (true) {
             for (int i = 0; i < 1000; i++) {
                 update(dt / 1000);
             }
@@ -77,12 +79,12 @@ public class Ball {
         if (xCenter > basket.getBasketCenter().x) {
 //            Gdx.app.log("baall","fff");
         }
-        if (yCenter > basket.getBasketCenter().y + BALL_DIAMETER/2*DIM) isAboveBasket = true;
+        if (yCenter > basket.getBasketCenter().y)  isAboveBasket = true;
         hitBox = new Circle(xCenter,yCenter,BALL_DIAMETER/2*DIM);
-//        checkEdgeIntersSquareFalse(basket.leftEdge);
-//        checkEdgeIntersSquareFalse(basket.rightEdge);
         checkEdgeIntersFalse(basket.leftEdge);
         checkEdgeIntersFalse(basket.rightEdge);
+//        checkEdgeInters(basket.leftEdge);
+//        checkEdgeInters(basket.rightEdge);
         checkBallIsScore();
         if (yCenter < 0) {
             ballIsOut = true;

@@ -29,9 +29,11 @@ public class Player {
     boolean seriaIsStart;
     float idealAngle;
     float dAngle;
+    boolean isAngleSerie;
+    float idealVel;
 
 
-    public Player(SpriteBatch batch, float x, float y, TekerBasket parent, ShapeRenderer shape) {
+    public Player(SpriteBatch batch, float x, float y, TekerBasket parent, ShapeRenderer shape, boolean serie) {
         width = Gdx.graphics.getWidth();
         height = Gdx.graphics.getHeight();
         this.batch = batch;
@@ -41,6 +43,8 @@ public class Player {
         this.y = y;
         pool = new ArrayList<Ball>();
         angleResult = new ArrayList<ExperResultAngle>();
+        isAngleSerie = serie;
+
     }
 
     public Vector2 getBallCenter() {
@@ -53,12 +57,14 @@ public class Player {
         return pos;
     }
 
-    public void throwBall(Vector2 velocity, float alfa, float idealAlfa, float dAngle) {
+    public void throwBall(Vector2 velocity, float alfa, float idealAlfa, float dAngle, float vel) {
         idealAngle = idealAlfa;
         ball = new Ball(batch,getBallCenter().x,getBallCenter().y,velocity ,alfa, parent.basket, shape, idealAlfa);
         pool.add(ball);
         seriaIsStart = true;
         this.dAngle = dAngle;
+        idealVel = vel;
+        float velLen = velocity.len();
     }
 
     public void render (float dt) {
@@ -85,18 +91,27 @@ public class Player {
         float dfiMin;
         float dfiMax;
         if (poolInBasket.size() >0) {
-            dfiMin = poolInBasket.get(0).initAlfa;
-            dfiMax = poolInBasket.get(poolInBasket.size() - 1).initAlfa;
+            if (isAngleSerie) {
+                dfiMin = poolInBasket.get(0).initAlfa;
+                dfiMax = poolInBasket.get(poolInBasket.size() - 1).initAlfa;
+            } else {
+                dfiMin = poolInBasket.get(0).initVelocityLen;
+                dfiMax = poolInBasket.get(poolInBasket.size() - 1).initVelocityLen;
+            }
         } else {
             dfiMin =0;
             dfiMax = 0;
         }
 
-        float dfi =0;
-        for (int j = 0; j < pool.size(); j++) {
-            if(pool.get(j).ballIsScore ) {
-                dfi += dAngle;
+        float dfi = 0;
+        if (isAngleSerie) {
+            for (int j = 0; j < pool.size(); j++) {
+                if (pool.get(j).ballIsScore) {
+                    dfi += dAngle;
+                }
             }
+        } else {
+            dfi = (dfiMax - dfiMin)/ idealVel * 100;
         }
 
         angleResult.add(new ExperResultAngle(idealAngle,dfiMin,dfiMax, dfi));
